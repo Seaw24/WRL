@@ -19,6 +19,11 @@ This project provides tools for collecting and syncing eye gaze data using Pupil
 python collect_gaze_data.py
 ```
 
+**Output**:
+- `[subject_name]/camera_frames.csv` - Camera frame timestamps and metadata
+- `[subject_name]/neon_gaze_raw.csv` - Raw gaze points from Neon (x, y, pupil diameter, confidence)
+- `[subject_name]/eye_video.mp4` - Recorded eye video (96x96 frames)
+
 ### 2. `sync_offline.py`
 **Purpose**: Offline syncing of camera frames with Pupil Neon gaze labels.
 
@@ -32,7 +37,15 @@ python collect_gaze_data.py
 # Default: sync all subjects
 python sync_offline.py
 
-# Sync postprocessed videos
+# S
+
+**Output**:
+- `[subject_name]_final_synced_labels.csv` - Synchronized labels matching:
+  - Camera frame numbers
+  - Gaze coordinates (gaze_x, gaze_y)
+  - Confidence scores
+  - Timestamps
+- Supports both original (96x96) and postprocessed (rotated/flipped) eye videosync postprocessed videos
 python sync_offline.py --postprocessed-root postprocessed_eye_videos
 
 # Sync specific subject
@@ -120,6 +133,36 @@ The `collect_gaze_data.py` script connects to the Pupil Neon device via IP. **Th
     ├── neon_gaze_raw.csv
     └── eye_video.mp4
 ```
+
+## Output Data Formats
+
+### From `collect_gaze_data.py`
+
+**camera_frames.csv** - Camera frame metadata
+- `frame_id` - Frame index
+- `timestamp` - Frame timestamp (milliseconds)
+- `camera_name` - Camera identifier
+
+**neon_gaze_raw.csv** - Raw Neon gaze data
+- `timestamp` - Gaze sample timestamp (milliseconds)
+- `gaze_x` - Gaze X coordinate (0-1600, Neon camera resolution)
+- `gaze_y` - Gaze Y coordinate (0-1200, Neon camera resolution)
+- `pupil_diameter` - Detected pupil size
+- `confidence` - Confidence score (0-1)
+
+**eye_video.mp4** - Recorded video
+- Resolution: 96x96 pixels (ROI-cropped)
+- Synchronized with gaze data
+
+### From `sync_offline.py`
+
+**[subject]_final_synced_labels.csv** - Synchronized frame-to-gaze mapping
+- `frame_id` - Camera frame index
+- `frame_timestamp` - Original camera frame timestamp
+- `gaze_x` - Matched gaze X coordinate
+- `gaze_y` - Matched gaze Y coordinate
+- `confidence` - Gaze confidence for that frame
+- `gaze_timestamp` - Original gaze sample timestamp
 
 ## Troubleshooting
 
